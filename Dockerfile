@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=builder /app /app
 
 # Установка менеджера uv и зависимостей Python
-RUN curl -fsSL https://astral.sh | sh && \
+RUN curl -fsSL https://astral.sh/uv/install.sh | sh && \
     export PATH="/root/.local/bin:$PATH" && \
     uv pip install --system -e .
 
