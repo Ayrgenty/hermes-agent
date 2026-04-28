@@ -21,15 +21,17 @@ RUN apt-get update && apt-get install -y \
 # Копируем только необходимые файлы из сборщика
 COPY --from=builder /app /app
 
-# Установка менеджера uv и зависимостей Python
+# Установка uv и пакета в режиме Editable (чтобы модули были видны)
 RUN curl -fsSL https://astral.sh/uv/install.sh | sh && \
-    export PATH="/root/.local/bin:$PATH" && \
-    uv pip install --system -e .
+    /root/.local/bin/uv pip install --system --no-cache .
 
-# Создаем папку для данных (которую мы примонтируем в Railway)
+# Добавляем текущую директорию в путь поиска модулей Python
+ENV PYTHONPATH="/app:${PYTHONPATH}"
+
+# Создаем папку для данных
 RUN mkdir -p /opt/data
 
 EXPOSE 3000
 
-# Запуск приложения
-CMD ["python", "-m", "hermes_agent.main"]
+# Запуск напрямую через файл, чтобы избежать проблем с именованием модулей
+CMD ["python", "hermes_agent/main.py"]
